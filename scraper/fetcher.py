@@ -38,22 +38,33 @@ def fetch_jobs():
 if __name__ == "__main__":
     from scraper.validator import validate_batch
     from scraper.storage import save_jobs
+    from scraper.logger import get_logger
+
+    logger = get_logger()
+    logger.info("Pipeline run started")
 
     for i in range(3):
-        print(f"\n--- Pull #{i+1} ---")
+        logger.info(f"--- Pull #{i+1} ---")
         data = fetch_jobs()
 
         if data is None:
-            print("Skipping this pull — no data returned.")
+            logger.error(f"Pull #{i+1} failed after all retries — no data returned")
             continue
 
         result = validate_batch(data["data"])
-        print(f"Total: {result['total']}, Valid: {result['valid_count']}, Invalid: {result['invalid_count']}")
+        logger.info(f"Total: {result['total']}, Valid: {result['valid_count']}, Invalid: {result['invalid_count']}")
+
+        if result["invalid_count"] > 0:
+            logger.warning(f"{result['invalid_count']} jobs failed schema validation — possible source change")
 
         storage_summary = save_jobs(result["valid_jobs"])
-        print(f"Storage: {storage_summary['added']} new, "
-              f"{storage_summary['already_known']} already known, "
-              f"{storage_summary['total_stored']} total stored")
+        logger.info(
+            f"Storage: {storage_summary['added']} new, "
+            f"{storage_summary['already_known']} already known, "
+            f"{storage_summary['total_stored']} total stored"
+        )
 
         if i < 2:
             polite_delay()
+
+    logger.info("Pipeline run finished")
