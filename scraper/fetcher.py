@@ -12,6 +12,9 @@ def fetch_jobs():
     increasing backoff. Returns None if all retries are exhausted,
     instead of crashing the whole pipeline.
     """
+    from scraper.logger import get_logger
+    logger = get_logger()
+
     headers = {
         "User-Agent": "job-scraper-demo/0.1 (educational project; contact: your-email@example.com)"
     }
@@ -23,15 +26,15 @@ def fetch_jobs():
             return response.json()
 
         except (requests.exceptions.RequestException, ValueError) as e:
-            print(f"Attempt {attempt}/{MAX_RETRIES} failed: {e}")
+            logger.warning(f"Attempt {attempt}/{MAX_RETRIES} failed: {e}")
 
             if attempt < MAX_RETRIES:
-                backoff_seconds = attempt * 3  # 3s, then 6s, then would be 9s
-                print(f"Retrying in {backoff_seconds}s...")
+                backoff_seconds = attempt * 3
+                logger.info(f"Retrying in {backoff_seconds}s...")
                 import time
                 time.sleep(backoff_seconds)
             else:
-                print("All retries exhausted. Giving up on this pull.")
+                logger.error("All retries exhausted. Giving up on this pull.")
                 return None
 
 
