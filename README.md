@@ -208,7 +208,7 @@ The pipeline also tracks:
 ### 1. Clone the repository
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+git clone https://github.com/arushrai007/job-scraper/
 cd job-scraper
 ```
 
