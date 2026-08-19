@@ -22,7 +22,7 @@ If the primary source became unavailable, I would stop retrying after
 a bounded number of attempts and switch to another permitted source
 adapter rather than attempting to circumvent the restriction.
 
-## 2. trade off 
+## 2. Trade off
 
 I prioritized a reliable end-to-end ingestion pipeline over building
 a complex frontend or integrating multiple job platforms because of my techstack and my previous experince while building this type of project.
