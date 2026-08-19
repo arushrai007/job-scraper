@@ -1,4 +1,5 @@
 import requests
+from scraper.pacing import polite_delay
 
 ARBEITNOW_URL = "https://www.arbeitnow.com/api/job-board-api"
 
@@ -18,7 +19,16 @@ def fetch_jobs():
 
 
 if __name__ == "__main__":
+    from scraper.validator import validate_batch
+
     data = fetch_jobs()
-    print(f"Fetched {len(data['data'])} jobs")
-    print("First job example:")
-    print(data['data'][0])
+    result = validate_batch(data["data"])
+
+    print(f"Total jobs fetched: {result['total']}")
+    print(f"Valid: {result['valid_count']}")
+    print(f"Invalid: {result['invalid_count']}")
+
+    if result["invalid_jobs"]:
+        print("\nProblems found:")
+        for item in result["invalid_jobs"]:
+            print(f"  {item['job_slug']}: {item['problems']}")
